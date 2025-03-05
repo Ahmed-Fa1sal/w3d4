@@ -1,0 +1,33 @@
+<div class="container mt-4">
+    <h2 class="mb-4">User List</h2>
+
+    <div class="row">
+        <div class="col-md-6 mb-4" *ngFor="let user of users">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">{{ user.name }}</h5>
+                    <div class="card-text">
+                        <div class="mb-2">
+                            <i class="bi bi-envelope"></i>
+                            <strong>Email:</strong> {{ user.email }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Username:</strong> {{ user.username }}
+                        </div>
+                        <div class="mb-2">
+                            <strong>Address:</strong> 
+                            {{ user.address?.street }}, 
+                            {{ user.address?.city }}, 
+                            {{ user.address?.zipcode }}
+                        </div>
+                        <div class="mt-3">
+                            <span class="badge bg-primary">
+                                Posts: {{ user.posts?.length || 0 }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
