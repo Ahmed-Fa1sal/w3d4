@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { switchMap, forkJoin, map } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError, catchError, switchMap, forkJoin, map } from 'rxjs';
 
 interface User {
   id: number;
@@ -24,12 +23,30 @@ export class UserService {
 
   constructor(private http: HttpClient) { }
 
+  private handleError(error: HttpErrorResponse) {
+    let errorMessage = 'An error occurred';
+    
+    if (error.error instanceof ErrorEvent) {
+      // Client-side error
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Server-side error
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }
+    
+    return throwError(() => errorMessage);
+  }
+
   getUsers(): Observable<User[]> {
-    return this.http.get<User[]>(`${this.baseUrl}/users`);
+    return this.http.get<User[]>(`${this.baseUrl}/users`).pipe(
+      catchError(this.handleError.bind(this))
+    );
   }
 
   getPostsByUserId(userId: number): Observable<Post[]> {
-    return this.http.get<Post[]>(`${this.baseUrl}/posts?userId=${userId}`);
+    return this.http.get<Post[]>(`${this.baseUrl}/posts?userId=${userId}`).pipe(
+      catchError(this.handleError.bind(this))
+    );
   }
 
   getUsersWithPosts(): Observable<(User & { posts: Post[] })[]> {
@@ -41,7 +58,8 @@ export class UserService {
           )
         );
         return forkJoin(usersWithPosts);
-      })
+      }),
+      catchError(this.handleError.bind(this))
     );
   }
 }
